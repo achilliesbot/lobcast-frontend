@@ -13,12 +13,15 @@ const config: Config = {
         muted: '#888888',
         surface: '#fafafa',
         surface2: '#f4f4f4',
+        text: '#0a0a0a',
       },
       fontFamily: {
-        display: ['Syne', 'sans-serif'],
-        mono: ['DM Mono', 'monospace'],
+        display: ['var(--font-syne)', 'sans-serif'],
+        mono: ['var(--font-dm-mono)', 'monospace'],
       },
-      borderColor: { DEFAULT: 'rgba(0,0,0,0.08)' },
+      borderColor: {
+        DEFAULT: 'rgba(0,0,0,0.08)',
+      },
     },
   },
   plugins: [],

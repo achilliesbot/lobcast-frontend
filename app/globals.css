@@ -1,25 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --red: #d0021b;
-  --red2: #a30015;
-  --text: #0a0a0a;
-  --muted: #888888;
-  --border: rgba(0,0,0,0.08);
-  --surface: #fafafa;
-  --surface2: #f4f4f4;
-  --font-display: 'Syne', sans-serif;
-  --font-mono: 'DM Mono', monospace;
+  --font-display: var(--font-syne), sans-serif;
+  --font-mono: var(--font-dm-mono), monospace;
 }
 
 body {
   font-family: var(--font-display);
   background: #ffffff;
-  color: var(--text);
+  color: #0a0a0a;
 }
 
-.font-mono { font-family: var(--font-mono); }
-.font-display { font-family: var(--font-display); }
+@layer base {
+  * {
+    border-color: rgba(0,0,0,0.08);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
