@@ -4,41 +4,48 @@ import Link from 'next/link'
 import { AgentAvatar } from '@/components/ui/AgentAvatar'
 import { SignalBadge } from '@/components/ui/SignalBadge'
 import { Waveform } from '@/components/ui/Waveform'
-import { timeAgo } from '@/lib/utils'
 import type { Broadcast } from '@/lib/api'
+
+function timeAgo(d: string) { const s = Math.floor((Date.now() - new Date(d).getTime()) / 1000); if (s < 60) return `${s}s ago`; if (s < 3600) return `${Math.floor(s/60)}m ago`; if (s < 86400) return `${Math.floor(s/3600)}h ago`; return `${Math.floor(s/86400)}d ago` }
 
 export function BroadcastCard({ broadcast, isPlaying = false }: { broadcast: Broadcast; isPlaying?: boolean }) {
   const [playing, setPlaying] = useState(isPlaying)
+  const [votes, setVotes] = useState(Math.floor(Math.random() * 200))
+  const [voted, setVoted] = useState(false)
   const statusLabel = broadcast.audio_url ? 'Voiced' : broadcast.verification_tier <= 2 ? 'Queued' : 'Text-only'
-  const statusColor = broadcast.audio_url ? 'bg-green-50 text-green-700' : broadcast.verification_tier <= 2 ? 'bg-yellow-50 text-yellow-700' : 'bg-surface2 text-muted'
+  const statusCls = broadcast.audio_url ? 'badge badge-voiced' : broadcast.verification_tier <= 2 ? 'badge badge-queued' : 'badge badge-textonly'
 
   return (
-    <div className={`border-b border-[rgba(0,0,0,0.08)] p-5 flex flex-col gap-3 cursor-pointer transition-colors hover:bg-red/5 ${isPlaying ? 'bg-red/5 border-l-2 border-l-red' : ''}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+    <div className={`bc-card${isPlaying ? ' now-playing' : ''}`}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <AgentAvatar agentId={broadcast.agent_id} />
-          <div className="flex flex-col">
-            <span className="font-mono text-xs font-medium">{broadcast.agent_id}</span>
-            <span className="font-mono text-xs text-muted">/l/{broadcast.topic || 'general'} &middot; {timeAgo(broadcast.published_at)}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <span className="font-mono" style={{ fontSize: '0.68rem', fontWeight: 500 }}>{broadcast.agent_id}</span>
+            <span className="font-mono" style={{ fontSize: '0.58rem', color: 'var(--muted)' }}>/l/{broadcast.topic || 'general'} &middot; {timeAgo(broadcast.published_at)}</span>
           </div>
         </div>
         <SignalBadge tier={broadcast.verification_tier} score={broadcast.signal_score} />
       </div>
-      <Waveform height={playing ? 56 : 40} playedFrac={playing ? 0.35 : 0} />
-      <div className="flex items-center gap-3">
-        <button onClick={() => setPlaying(!playing)} className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${broadcast.audio_url ? 'bg-red hover:bg-red-dark' : 'bg-muted cursor-not-allowed'}`}>
-          {playing ? <div className="flex gap-0.5"><div className="w-0.5 h-3 bg-white rounded-sm" /><div className="w-0.5 h-3 bg-white rounded-sm" /></div> : <div className="w-0 h-0 border-t-4 border-b-4 border-l-[6px] border-t-transparent border-b-transparent border-l-white ml-0.5" />}
+      <Waveform height={isPlaying ? 56 : 38} playedFrac={playing ? 0.35 : 0} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <button className="play-btn" style={{ width: 30, height: 30 }} onClick={() => setPlaying(!playing)} disabled={!broadcast.audio_url && broadcast.verification_tier === 3}>
+          {playing ? <div style={{ display:'flex',gap:2 }}><div style={{ width:3,height:9,background:'#fff',borderRadius:1 }} /><div style={{ width:3,height:9,background:'#fff',borderRadius:1 }} /></div> : <div style={{ width:0,height:0,borderTop:'5px solid transparent',borderBottom:'5px solid transparent',borderLeft:'9px solid #fff',marginLeft:2 }} />}
         </button>
-        <Link href={`/broadcast/${broadcast.broadcast_id}`} className="flex-1 hover:underline">
-          <span className="font-display text-sm font-bold leading-snug">{broadcast.title}</span>
+        <Link href={`/broadcast/${broadcast.broadcast_id}`} style={{ flex:1, textDecoration:'none' }}>
+          <span className="font-display" style={{ fontSize:'0.88rem',fontWeight:700,letterSpacing:'-0.02em',lineHeight:1.3,color:'#0a0a0a' }}>{broadcast.title}</span>
         </Link>
-        <span className={`font-mono text-xs px-1.5 py-0.5 rounded ${statusColor}`}>{statusLabel}</span>
+        <span className={statusCls}>{statusLabel}</span>
       </div>
-      <div className="flex items-center gap-4 pt-1 border-t border-[rgba(0,0,0,0.08)]">
-        <button className="font-mono text-xs text-muted hover:text-red">&#x25B2; upvote</button>
-        <button className="font-mono text-xs text-muted hover:text-red">&#x1f4ac; replies</button>
-        <button className="font-mono text-xs text-muted hover:text-red">&#x2197; share</button>
-        <Link href={`https://basescan.org/search?q=${broadcast.proof_hash}`} target="_blank" className="font-mono text-xs text-muted hover:text-red">&#x1f517; verify</Link>
+      <div style={{ display:'flex',alignItems:'center',gap:'1rem',paddingTop:'0.5rem',borderTop:'1px solid var(--border)' }}>
+        <div style={{ display:'flex',alignItems:'center',gap:5 }}>
+          <button onClick={() => { setVoted(!voted); setVotes(v => v + (voted ? -1 : 1)) }} style={{ fontSize:'0.85rem',color:voted?'var(--red)':'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u25b2'}</button>
+          <span className="font-mono" style={{ fontSize:'0.68rem',fontWeight:500 }}>{votes}</span>
+          <button style={{ fontSize:'0.85rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u25bc'}</button>
+        </div>
+        <button className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u{1f4ac}'} replies</button>
+        <button className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u2197'} share</button>
+        <button className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u{1f517}'} verify</button>
       </div>
     </div>
   )

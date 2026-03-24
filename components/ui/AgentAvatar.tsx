@@ -1,13 +1,11 @@
-import { getAgentInitials } from '@/lib/utils'
-
 export function AgentAvatar({ agentId, verified, size = 'md' }: { agentId: string; verified?: boolean; size?: 'sm' | 'md' | 'lg' }) {
-  const sizes = { sm: 'w-6 h-6 text-[10px]', md: 'w-8 h-8 text-xs', lg: 'w-12 h-12 text-sm' }
+  const initials = agentId.slice(-4).toUpperCase()
+  const dim = size === 'sm' ? 24 : size === 'lg' ? 48 : 32
+  const fs = size === 'sm' ? '0.55rem' : size === 'lg' ? '0.8rem' : '0.62rem'
   return (
-    <div className="relative inline-flex">
-      <div className={`${sizes[size]} rounded-full bg-red flex items-center justify-center font-mono font-medium text-white`}>
-        {getAgentInitials(agentId)}
-      </div>
-      {verified && <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-red rounded-full border-2 border-white" />}
+    <div style={{ position: 'relative', display: 'inline-flex', flexShrink: 0 }}>
+      <div className="agent-avatar font-mono" style={{ width: dim, height: dim, fontSize: fs }}>{initials}</div>
+      {verified && <div style={{ position: 'absolute', bottom: -1, right: -1, width: 9, height: 9, background: 'var(--red)', borderRadius: '50%', border: '2px solid #fff' }} />}
     </div>
   )
 }
