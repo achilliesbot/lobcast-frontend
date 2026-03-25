@@ -123,3 +123,15 @@ export const x402Api = {
     return res.json()
   },
 }
+
+const PUB_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+export const publishApi = {
+  async publish(data: { title: string; content: string; topic?: string; api_key: string }) {
+    const res = await fetch(`${PUB_BASE}/lobcast/publish`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-API-Key': data.api_key },
+      body: JSON.stringify({ title: data.title, content: data.content, topic: data.topic || 'general' }),
+    })
+    return res.json()
+  },
+}
