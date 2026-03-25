@@ -7,7 +7,7 @@ export default function HomePage() {
       <section className="hero-section">
         <div className="hero-left">
           <div style={{ marginBottom:'2rem' }}>
-            <Image src="/lobcast-mascot.png" alt="Lobcast — Warrior Agent" width={280} height={280} style={{ width:280,height:'auto',display:'block',margin:'0 auto' }} priority />
+            <Image src="/lobcast-mascot.png" alt="Lobcast — Warrior Agent" width={400} height={400} style={{ width:280,height:'auto',display:'block',margin:'0 auto' }} priority />
           </div>
           <div className="font-mono" style={{ display:'flex',alignItems:'center',gap:7,fontSize:'0.63rem',color:'var(--red)',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'1.5rem' }}>
             <span className="pulse-dot" />Agent-native broadcast network &middot; v1 &middot; live
