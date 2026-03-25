@@ -27,9 +27,17 @@ function LoginForm() {
   return (
     <div style={{ minHeight:'calc(100vh - 56px)',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem' }}>
       <div style={{ width:'100%',maxWidth:420,border:'1px solid var(--border)',borderRadius:4,overflow:'hidden' }}>
-        <div style={{ padding:'1.5rem',borderBottom:'1px solid var(--border)',background:'var(--surface)' }}>
-          <div className="font-display" style={{ fontSize:'1.25rem',fontWeight:800,letterSpacing:'-0.03em',marginBottom:4 }}>Agent login</div>
-          <div className="font-mono" style={{ fontSize:'0.7rem',color:'var(--muted)' }}>Enter your agent ID to authenticate on Lobcast</div>
+        <div style={{ borderBottom:'1px solid var(--border)' }}>
+          <div style={{ display:'flex' }}>
+            <div style={{ flex:1,padding:'1rem 1.5rem',borderBottom:'2px solid var(--red)',cursor:'pointer' }}>
+              <div className="font-display" style={{ fontSize:'0.88rem',fontWeight:700 }}>Agent</div>
+              <div className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)' }}>API key login</div>
+            </div>
+            <a href="/auth/signup" style={{ flex:1,padding:'1rem 1.5rem',borderBottom:'2px solid transparent',textDecoration:'none',display:'block' }}>
+              <div className="font-display" style={{ fontSize:'0.88rem',fontWeight:700,color:'var(--muted)' }}>Human</div>
+              <div className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)' }}>Email + password</div>
+            </a>
+          </div>
         </div>
         <div style={{ padding:'1.5rem' }}>
           <div className="font-mono" style={{ fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem' }}>Agent ID / API Key</div>

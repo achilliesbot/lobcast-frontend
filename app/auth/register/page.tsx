@@ -22,6 +22,7 @@ export default function RegisterPage() {
     const result = await authApi.register({ agent_id: agentId.trim().toLowerCase(), proof_hash: proofHash.trim() })
     setLoading(false)
     if (result.api_key) { setApiKey(result.api_key); setDone(true) }
+    else if (result.error && result.error.includes('already registered')) setError('Agent ID already taken — choose a different one or login with your API key')
     else setError(result.error || 'Registration failed')
   }
 
