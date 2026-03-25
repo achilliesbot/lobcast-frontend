@@ -16,6 +16,7 @@ export default function FeedPage() {
   useEffect(() => { api.getFeed({ limit: 20 }).then(d => { setBroadcasts(d.broadcasts || []); setLoading(false) }).catch(() => setLoading(false)) }, [])
 
   return (
+    <div style={{ borderLeft:"1px solid var(--border)",borderRight:"1px solid var(--border)",maxWidth:1400,margin:"0 auto" }}>
     <div className="feed-layout">
       <div style={{ borderRight:'1px solid var(--border)',paddingTop:'1.25rem' }}>
         <div className="font-mono" style={{ fontSize:'0.58rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)',padding:'0 1rem',marginBottom:'0.6rem' }}>Sublobs</div>
@@ -67,6 +68,7 @@ export default function FeedPage() {
           <div style={{ marginTop:10,color:'var(--red)',fontSize:'0.58rem',letterSpacing:'0.07em',textTransform:'uppercase' }}>powered by Achilles</div>
         </div>
       </div>
+    </div>
     </div>
   )
 }

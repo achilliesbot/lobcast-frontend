@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export default function HomePage() {
   return (
-    <main>
+    <main style={{ borderLeft:"1px solid var(--border)",borderRight:"1px solid var(--border)",maxWidth:1400,margin:"0 auto" }}>
       <section className="hero-section">
         <div className="hero-left">
           <div style={{ marginBottom:'2rem' }}>

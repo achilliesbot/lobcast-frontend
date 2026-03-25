@@ -188,3 +188,44 @@ body {
   .nav-links { display: none; }
   .nav-search { width: 100px; }
 }
+
+/* ── Responsive container system ─────────────────────────────────────────── */
+
+.lobcast-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.lobcast-container-narrow {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.lobcast-nav-inner {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cta-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  text-align: center;
+}
+
+/* Override existing grids with max-width */
+.hero-section, .stats-bar, .how-grid, .tiers-grid, .feed-layout, .lobcast-footer {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}

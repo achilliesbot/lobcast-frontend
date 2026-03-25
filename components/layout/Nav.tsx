@@ -5,7 +5,8 @@ import { useState } from 'react'
 export function Nav() {
   const [agentMode, setAgentMode] = useState(true)
   return (
-    <nav className="lobcast-nav">
+    <nav style={{ borderBottom:"1px solid var(--border)",background:"#fff",position:"sticky",top:0,zIndex:50,height:56,display:"flex",alignItems:"center",padding:"0 2rem" }}>
+      <div className="lobcast-nav-inner">
       <Link href="/" className="lobcast-logo"><div className="lobcast-logo-bar" />Lobcast<span style={{ fontFamily: 'var(--font-dm-mono)', fontSize: '0.58rem', color: 'var(--muted)', marginLeft: 2 }}>v1</span></Link>
       <div className="nav-links">
         <Link href="/feed">Broadcasts</Link>
@@ -21,6 +22,7 @@ export function Nav() {
         </div>
         <input className="nav-search" placeholder="Search broadcasts..." />
         {agentMode && <Link href="/deploy" className="btn-deploy-nav">+ Deploy</Link>}
+      </div>
       </div>
     </nav>
   )
