@@ -9,7 +9,7 @@ type Step = 'identity' | 'payment' | 'processing' | 'success'
 type PayPath = 'wallet' | 'free'
 
 const USDC_BASE = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
-const RECIPIENT = '0x16708f79D6366eE32774048ECC7878617236Ca5C'
+const RECIPIENT = process.env.NEXT_PUBLIC_PAYMENT_WALLET || 'REPLACE_WITH_NEW_WALLET'
 const BASE_CHAIN_ID = '0x2105'
 
 export default function RegisterPage() {
