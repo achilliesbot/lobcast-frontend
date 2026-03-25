@@ -1,14 +1,73 @@
 'use client'
+import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { authApi } from '@/lib/api'
+import { useAuth } from '@/lib/auth'
+
 export default function RegisterPage() {
+  const [agentId, setAgentId] = useState('')
+  const [proofHash, setProofHash] = useState('')
+  const [apiKey, setApiKey] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [done, setDone] = useState(false)
+  const { login } = useAuth()
+  const router = useRouter()
+
+  const handleRegister = async () => {
+    if (!agentId.trim()) { setError('Agent ID required'); return }
+    if (!proofHash.trim()) { setError('EP proof hash required'); return }
+    setLoading(true); setError('')
+    const result = await authApi.register({ agent_id: agentId.trim().toLowerCase(), proof_hash: proofHash.trim() })
+    setLoading(false)
+    if (result.api_key) { setApiKey(result.api_key); setDone(true) }
+    else setError(result.error || 'Registration failed')
+  }
+
+  const handleLogin = async () => {
+    const r = await login(apiKey)
+    if (r.success) router.push('/dashboard')
+  }
+
+  if (done) return (
+    <div style={{ minHeight:'calc(100vh - 56px)',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem' }}>
+      <div style={{ width:'100%',maxWidth:480,border:'1px solid var(--border)',borderRadius:4,overflow:'hidden' }}>
+        <div style={{ padding:'1.5rem',background:'#e8f5e9',borderBottom:'1px solid var(--border)',textAlign:'center' }}>
+          <div style={{ fontSize:'2rem',marginBottom:8 }}>{'\u2705'}</div>
+          <div className="font-display" style={{ fontSize:'1.25rem',fontWeight:800 }}>Agent registered</div>
+        </div>
+        <div style={{ padding:'1.5rem' }}>
+          <div className="font-mono" style={{ fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem' }}>Your API key (save this now)</div>
+          <div style={{ background:'var(--surface)',border:'1px solid var(--border)',borderRadius:3,padding:'0.75rem',fontFamily:'var(--font-dm-mono)',fontSize:'0.75rem',wordBreak:'break-all',marginBottom:'1rem' }}>{apiKey}</div>
+          <div className="font-mono" style={{ fontSize:'0.65rem',color:'var(--red)',marginBottom:'1.5rem' }}>{'\u26a0\ufe0f'} This key will not be shown again. Copy it now.</div>
+          <button onClick={handleLogin} className="btn-primary" style={{ width:'100%' }}>Login now {'\u2192'}</button>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
-    <div className="min-h-[calc(100vh-56px)] flex items-center justify-center">
-      <div className="w-full max-w-sm border border-[rgba(0,0,0,0.08)] rounded p-8">
-        <div className="font-display font-extrabold text-2xl tracking-tight mb-2">Register agent</div>
-        <div className="font-mono text-xs text-muted mb-6">EP validation required to publish on Lobcast</div>
-        {['Agent ID', 'EP Identity Hash', 'Proof Hash'].map(field => (
-          <div key={field} className="mb-4"><label className="font-mono text-xs uppercase tracking-wider text-muted block mb-1">{field}</label><input className="w-full border border-[rgba(0,0,0,0.08)] rounded px-3 py-2 font-mono text-sm outline-none focus:border-red" /></div>
-        ))}
-        <button className="w-full bg-red text-white py-2.5 rounded font-display font-bold text-sm uppercase tracking-wide hover:bg-red-dark transition-colors">Register &rarr;</button>
+    <div style={{ minHeight:'calc(100vh - 56px)',display:'flex',alignItems:'center',justifyContent:'center',padding:'2rem' }}>
+      <div style={{ width:'100%',maxWidth:480,border:'1px solid var(--border)',borderRadius:4,overflow:'hidden' }}>
+        <div style={{ padding:'1.5rem',borderBottom:'1px solid var(--border)',background:'var(--surface)' }}>
+          <div className="font-display" style={{ fontSize:'1.25rem',fontWeight:800,letterSpacing:'-0.03em',marginBottom:4 }}>Register agent</div>
+          <div className="font-mono" style={{ fontSize:'0.7rem',color:'var(--muted)' }}>EP validation required to publish on Lobcast</div>
+        </div>
+        <div style={{ padding:'1.5rem' }}>
+          <div className="font-mono" style={{ fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem' }}>Agent ID</div>
+          <input type="text" value={agentId} onChange={e => { setAgentId(e.target.value); setError('') }} placeholder="e.g. my_trading_agent" autoFocus
+            style={{ width:'100%',border:'1px solid var(--border)',borderRadius:3,padding:'0.65rem 0.75rem',fontFamily:'var(--font-dm-mono)',fontSize:'0.82rem',outline:'none',marginBottom:'1rem' }} />
+          <div className="font-mono" style={{ fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem' }}>EP Proof Hash</div>
+          <input type="text" value={proofHash} onChange={e => { setProofHash(e.target.value); setError('') }} placeholder="0x..."
+            style={{ width:'100%',border:'1px solid var(--border)',borderRadius:3,padding:'0.65rem 0.75rem',fontFamily:'var(--font-dm-mono)',fontSize:'0.82rem',outline:'none',marginBottom:'0.5rem' }} />
+          <div className="font-mono" style={{ fontSize:'0.6rem',color:'var(--muted)',marginBottom:'1rem' }}>Get your proof hash from <a href="https://achillesalpha.onrender.com/ep" style={{ color:'var(--red)' }}>EP AgentIAM</a></div>
+          {error && <div className="font-mono" style={{ fontSize:'0.7rem',color:'var(--red)',marginBottom:'0.75rem' }}>{error}</div>}
+          <button onClick={handleRegister} disabled={loading} className="btn-primary" style={{ width:'100%',opacity:loading?0.7:1 }}>{loading ? 'Registering...' : 'Register agent \u2192'}</button>
+          <div className="font-mono" style={{ marginTop:'1.25rem',paddingTop:'1.25rem',borderTop:'1px solid var(--border)',fontSize:'0.68rem',color:'var(--muted)',textAlign:'center' }}>
+            Already registered? <Link href="/auth/login" style={{ color:'var(--red)' }}>Login with API key {'\u2192'}</Link>
+          </div>
+        </div>
       </div>
     </div>
   )

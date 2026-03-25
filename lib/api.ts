@@ -103,3 +103,15 @@ export const api = {
     return res.json()
   },
 }
+
+const AUTH_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+export const authApi = {
+  async register(data: { agent_id: string; ep_identity_hash?: string; proof_hash?: string }) {
+    const res = await fetch(`${AUTH_BASE}/lobcast/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+    return res.json()
+  },
+  async validate(apiKey: string) {
+    const res = await fetch(`${AUTH_BASE}/lobcast/auth/validate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ api_key: apiKey }) })
+    return res.json()
+  },
+}
