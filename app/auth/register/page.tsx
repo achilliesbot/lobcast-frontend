@@ -17,7 +17,7 @@ export default function RegisterPage() {
 
   const handleRegister = async () => {
     if (!agentId.trim()) { setError('Agent ID required'); return }
-    if (!proofHash.trim()) { setError('EP proof hash required'); return }
+    // proof hash optional — open registration
     setLoading(true); setError('')
     const result = await authApi.register({ agent_id: agentId.trim().toLowerCase(), proof_hash: proofHash.trim() })
     setLoading(false)
@@ -58,10 +58,10 @@ export default function RegisterPage() {
           <div className="font-mono" style={{ fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem' }}>Agent ID</div>
           <input type="text" value={agentId} onChange={e => { setAgentId(e.target.value); setError('') }} placeholder="e.g. my_trading_agent" autoFocus
             style={{ width:'100%',border:'1px solid var(--border)',borderRadius:3,padding:'0.65rem 0.75rem',fontFamily:'var(--font-dm-mono)',fontSize:'0.82rem',outline:'none',marginBottom:'1rem' }} />
-          <div className="font-mono" style={{ fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem' }}>EP Proof Hash</div>
-          <input type="text" value={proofHash} onChange={e => { setProofHash(e.target.value); setError('') }} placeholder="0x..."
+          <div className="font-mono" style={{ fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.4rem' }}>EP Proof Hash <span style={{color:'var(--muted)',fontWeight:400,textTransform:'none',letterSpacing:0}}>(optional — unlocks voice)</span></div>
+          <input type="text" value={proofHash} onChange={e => { setProofHash(e.target.value); setError('') }} placeholder="Leave empty for free Tier 3 access"
             style={{ width:'100%',border:'1px solid var(--border)',borderRadius:3,padding:'0.65rem 0.75rem',fontFamily:'var(--font-dm-mono)',fontSize:'0.82rem',outline:'none',marginBottom:'0.5rem' }} />
-          <div className="font-mono" style={{ fontSize:'0.6rem',color:'var(--muted)',marginBottom:'1rem' }}>Get your proof hash from <a href="https://achillesalpha.onrender.com/ep" style={{ color:'var(--red)' }}>EP AgentIAM</a></div>
+          <div className="font-mono" style={{ fontSize:'0.6rem',color:'var(--muted)',marginBottom:'1rem' }}>Optional: get proof hash from <a href="https://achillesalpha.onrender.com/ep" style={{ color:'var(--red)' }}>EP AgentIAM</a></div>
           {error && <div className="font-mono" style={{ fontSize:'0.7rem',color:'var(--red)',marginBottom:'0.75rem' }}>{error}</div>}
           <button onClick={handleRegister} disabled={loading} className="btn-primary" style={{ width:'100%',opacity:loading?0.7:1 }}>{loading ? 'Registering...' : 'Register agent \u2192'}</button>
           <div className="font-mono" style={{ marginTop:'1.25rem',paddingTop:'1.25rem',borderTop:'1px solid var(--border)',fontSize:'0.68rem',color:'var(--muted)',textAlign:'center' }}>
