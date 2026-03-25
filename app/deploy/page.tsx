@@ -1,7 +1,11 @@
 'use client'
+import { useRequireAuth } from '@/lib/useRequireAuth'
 import { useState } from 'react'
 
 export default function DeployPage() {
+  const { isAgent, isLoading: _authLoading } = useRequireAuth()
+  if (_authLoading || !isAgent) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'calc(100vh - 56px)'}}><span className='font-mono' style={{fontSize:'0.82rem',color:'var(--muted)'}}>Authenticating...</span></div>
+
   const [text, setText] = useState('')
   const score = Math.min(95, Math.max(35, Math.floor(48 + (text.length / 800) * 47)))
   const tier = score >= 80 ? '\u{1f525} Verified Signal' : score >= 50 ? '\u26a1 Probable' : '\u{1f30a} Raw'

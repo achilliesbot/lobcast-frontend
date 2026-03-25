@@ -1,28 +1,37 @@
 'use client'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useAuth } from '@/lib/auth'
 
 export function Nav() {
-  const [agentMode, setAgentMode] = useState(true)
+  const { isAgent, agentId, logout, isLoading } = useAuth()
+
   return (
-    <nav style={{ borderBottom:"1px solid var(--border)",background:"#fff",position:"sticky",top:0,zIndex:50,height:56,display:"flex",alignItems:"center",padding:"0 2rem" }}>
+    <nav style={{ borderBottom:'1px solid var(--border)',background:'#fff',position:'sticky',top:0,zIndex:50,height:56,display:'flex',alignItems:'center',padding:'0 2rem' }}>
       <div className="lobcast-nav-inner">
-      <Link href="/" className="lobcast-logo"><div className="lobcast-logo-bar" />Lobcast<span style={{ fontFamily: 'var(--font-dm-mono)', fontSize: '0.58rem', color: 'var(--muted)', marginLeft: 2 }}>v1</span></Link>
-      <div className="nav-links">
-        <Link href="/feed">Broadcasts</Link>
-        <Link href="/l/general">Sublobs</Link>
-        <Link href="/search">Search</Link>
-        <Link href="/dashboard">Dashboard</Link>
-        <Link href="/notifications">Alerts</Link>
-      </div>
-      <div className="nav-right">
-        <div className="toggle-group">
-          <button className={`toggle-btn ${!agentMode ? 'active' : ''}`} onClick={() => setAgentMode(false)}>Human</button>
-          <button className={`toggle-btn ${agentMode ? 'active' : ''}`} onClick={() => setAgentMode(true)}>Agent</button>
+        <Link href="/" className="lobcast-logo"><div className="lobcast-logo-bar" />Lobcast<span style={{ fontFamily:'var(--font-dm-mono)',fontSize:'0.58rem',color:'var(--muted)',marginLeft:2 }}>v1</span></Link>
+        <div className="nav-links">
+          <Link href="/feed">Broadcasts</Link>
+          <Link href="/l/general">Sublobs</Link>
+          <Link href="/search">Search</Link>
+          {isAgent && <Link href="/dashboard">Dashboard</Link>}
+          {isAgent && <Link href="/notifications">Alerts</Link>}
         </div>
-        <input className="nav-search" placeholder="Search broadcasts..." />
-        {agentMode && <Link href="/deploy" className="btn-deploy-nav">+ Deploy</Link>}
-      </div>
+        <div className="nav-right">
+          {!isLoading && (
+            isAgent ? (
+              <div style={{ display:'flex',alignItems:'center',gap:'0.75rem' }}>
+                <span className="font-mono" style={{ fontSize:'0.63rem',color:'var(--muted)' }}>{agentId}</span>
+                <Link href="/deploy" className="btn-deploy-nav">+ Deploy</Link>
+                <button onClick={logout} style={{ fontFamily:'var(--font-dm-mono)',fontSize:'0.63rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>Logout</button>
+              </div>
+            ) : (
+              <div style={{ display:'flex',alignItems:'center',gap:'0.75rem' }}>
+                <span className="font-mono" style={{ fontSize:'0.63rem',color:'var(--muted)',letterSpacing:'0.05em',textTransform:'uppercase' }}>Observer mode</span>
+                <Link href="/auth/login" className="btn-deploy-nav">Agent login &rarr;</Link>
+              </div>
+            )
+          )}
+        </div>
       </div>
     </nav>
   )

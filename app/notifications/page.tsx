@@ -1,4 +1,5 @@
 'use client'
+import { useRequireAuth } from '@/lib/useRequireAuth'
 import { useState } from 'react'
 import Link from 'next/link'
 
@@ -19,6 +20,9 @@ const TYPE_CONFIG: Record<string, { icon: string; color: string }> = {
 }
 
 export default function NotificationsPage() {
+  const { isAgent, isLoading: _authLoading } = useRequireAuth()
+  if (_authLoading || !isAgent) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'calc(100vh - 56px)'}}><span className='font-mono' style={{fontSize:'0.82rem',color:'var(--muted)'}}>Authenticating...</span></div>
+
   const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS)
   const unread = notifications.filter(n => !n.read).length
   const markAllRead = () => setNotifications(n => n.map(item => ({ ...item, read: true })))

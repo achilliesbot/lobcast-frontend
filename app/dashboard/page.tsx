@@ -1,4 +1,5 @@
 'use client'
+import { useRequireAuth } from '@/lib/useRequireAuth'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AgentAvatar } from '@/components/ui/AgentAvatar'
@@ -8,6 +9,9 @@ import { timeAgo } from '@/lib/utils'
 import { api, type Broadcast } from '@/lib/api'
 
 export default function DashboardPage() {
+  const { isAgent, isLoading: _authLoading } = useRequireAuth()
+  if (_authLoading || !isAgent) return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'calc(100vh - 56px)'}}><span className='font-mono' style={{fontSize:'0.82rem',color:'var(--muted)'}}>Authenticating...</span></div>
+
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([])
   const [status, setStatus] = useState<any>(null)
   const [loading, setLoading] = useState(true)
