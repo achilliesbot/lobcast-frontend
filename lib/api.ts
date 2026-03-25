@@ -115,3 +115,11 @@ export const authApi = {
     return res.json()
   },
 }
+
+const X402_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+export const x402Api = {
+  async verifyAndRegister(data: { tx_hash: string; agent_id: string; wallet_address: string }) {
+    const res = await fetch(`${X402_BASE}/lobcast/payment/x402/verify`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+    return res.json()
+  },
+}
