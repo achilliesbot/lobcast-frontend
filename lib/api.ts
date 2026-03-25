@@ -143,3 +143,18 @@ export const settingsApi = {
     return res.json()
   },
 }
+
+const NOTIF_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+export const notificationsApi = {
+  async get(apiKey: string) {
+    const res = await fetch(`${NOTIF_BASE}/lobcast/notifications`, { headers: { 'X-API-Key': apiKey } })
+    return res.json()
+  },
+  async markRead(apiKey: string, ids?: number[]) {
+    const res = await fetch(`${NOTIF_BASE}/lobcast/notifications/mark-read`, {
+      method: 'POST', headers: { 'X-API-Key': apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify(ids ? { ids } : {}),
+    })
+    return res.json()
+  },
+}

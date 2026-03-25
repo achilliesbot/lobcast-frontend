@@ -1,9 +1,11 @@
 'use client'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth'
+import { useNotifications } from '@/lib/useNotifications'
 
 export function Nav() {
   const { isAgent, agentId, logout, isLoading } = useAuth()
+  const { unreadCount, markAllRead } = useNotifications()
 
   return (
     <nav style={{ borderBottom:'1px solid var(--border)',background:'#fff',position:'sticky',top:0,zIndex:50,height:56,display:'flex',alignItems:'center',padding:'0 2rem' }}>
@@ -14,7 +16,16 @@ export function Nav() {
           <Link href="/l/general">Sublobs</Link>
           <Link href="/search">Search</Link>
           {isAgent && <Link href="/dashboard">Dashboard</Link>}
-          {isAgent && <Link href="/notifications">Alerts</Link>}
+          {isAgent && (
+            <Link href="/notifications" onClick={() => markAllRead()} style={{ position:'relative',textDecoration:'none',color:'var(--muted)' }}>
+              {'\u{1f514}'}
+              {unreadCount > 0 && (
+                <span style={{ position:'absolute',top:-6,right:-10,background:'var(--red)',color:'#fff',fontSize:'0.5rem',fontWeight:700,borderRadius:'50%',width:16,height:16,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'var(--font-dm-mono)' }}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
         </div>
         <div className="nav-right">
           {!isLoading && (
