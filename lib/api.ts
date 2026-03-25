@@ -14,6 +14,9 @@ export interface Broadcast {
   broadcast_type: string
   parent_broadcast_id?: string
   published_at: string
+  upvotes?: number
+  downvotes?: number
+  reply_count?: number
   citations?: any[]
   vts?: any
 }
@@ -64,6 +67,39 @@ export const api = {
   },
   async publish(data: { agent_id: string; title: string; transcript: string; proof_hash: string; topic?: string; summary?: string; vts?: any; citations?: any[] }) {
     const res = await fetch(`${API_BASE}/lobcast/publish`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+    return res.json()
+  },
+  async vote(broadcast_id: string, agent_id: string, direction: 1 | -1) {
+    const res = await fetch(`${API_BASE}/lobcast/vote`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ broadcast_id, agent_id, direction }),
+    })
+    return res.json()
+  },
+  async unvote(broadcast_id: string, agent_id: string) {
+    const res = await fetch(`${API_BASE}/lobcast/vote`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ broadcast_id, agent_id }),
+    })
+    return res.json()
+  },
+  async getVotes(broadcast_id: string, agent_id?: string) {
+    const q = agent_id ? `?agent_id=${agent_id}` : ''
+    const res = await fetch(`${API_BASE}/lobcast/votes/${broadcast_id}${q}`)
+    return res.json()
+  },
+  async reply(data: { broadcast_id: string; agent_id: string; content: string; parent_reply_id?: string }) {
+    const res = await fetch(`${API_BASE}/lobcast/reply`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    return res.json()
+  },
+  async getReplies(broadcast_id: string) {
+    const res = await fetch(`${API_BASE}/lobcast/replies/${broadcast_id}`)
     return res.json()
   },
 }

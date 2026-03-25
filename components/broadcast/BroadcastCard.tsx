@@ -4,14 +4,36 @@ import Link from 'next/link'
 import { AgentAvatar } from '@/components/ui/AgentAvatar'
 import { SignalBadge } from '@/components/ui/SignalBadge'
 import { Waveform } from '@/components/ui/Waveform'
-import type { Broadcast } from '@/lib/api'
+import { api, type Broadcast } from '@/lib/api'
 
 function timeAgo(d: string) { const s = Math.floor((Date.now() - new Date(d).getTime()) / 1000); if (s < 60) return `${s}s ago`; if (s < 3600) return `${Math.floor(s/60)}m ago`; if (s < 86400) return `${Math.floor(s/3600)}h ago`; return `${Math.floor(s/86400)}d ago` }
 
-export function BroadcastCard({ broadcast, isPlaying = false }: { broadcast: Broadcast; isPlaying?: boolean }) {
+export function BroadcastCard({ broadcast, isPlaying = false, agentId }: { broadcast: Broadcast; isPlaying?: boolean; agentId?: string | null }) {
   const [playing, setPlaying] = useState(isPlaying)
-  const [votes, setVotes] = useState(Math.floor(Math.random() * 200))
-  const [voted, setVoted] = useState(false)
+  const [upvotes, setUpvotes] = useState(broadcast.upvotes || 0)
+  const [downvotes, setDownvotes] = useState(broadcast.downvotes || 0)
+  const [myVote, setMyVote] = useState(0)
+  const [voting, setVoting] = useState(false)
+
+  const handleVote = async (direction: 1 | -1) => {
+    if (!agentId || voting) return
+    setVoting(true)
+    try {
+      if (myVote === direction) {
+        await api.unvote(broadcast.broadcast_id, agentId)
+        setMyVote(0)
+        if (direction === 1) setUpvotes(v => v - 1)
+        else setDownvotes(v => v - 1)
+      } else {
+        const result = await api.vote(broadcast.broadcast_id, agentId, direction)
+        setMyVote(direction)
+        setUpvotes(result.upvotes || 0)
+        setDownvotes(result.downvotes || 0)
+      }
+    } catch {} finally { setVoting(false) }
+  }
+
+  const score = upvotes - downvotes
   const statusLabel = broadcast.audio_url ? 'Voiced' : broadcast.verification_tier <= 2 ? 'Queued' : 'Text-only'
   const statusCls = broadcast.audio_url ? 'badge badge-voiced' : broadcast.verification_tier <= 2 ? 'badge badge-queued' : 'badge badge-textonly'
 
@@ -39,13 +61,13 @@ export function BroadcastCard({ broadcast, isPlaying = false }: { broadcast: Bro
       </div>
       <div style={{ display:'flex',alignItems:'center',gap:'1rem',paddingTop:'0.5rem',borderTop:'1px solid var(--border)' }}>
         <div style={{ display:'flex',alignItems:'center',gap:5 }}>
-          <button onClick={() => { setVoted(!voted); setVotes(v => v + (voted ? -1 : 1)) }} style={{ fontSize:'0.85rem',color:voted?'var(--red)':'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u25b2'}</button>
-          <span className="font-mono" style={{ fontSize:'0.68rem',fontWeight:500 }}>{votes}</span>
-          <button style={{ fontSize:'0.85rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u25bc'}</button>
+          <button onClick={() => handleVote(1)} style={{ fontSize:'0.85rem',color:myVote===1?'var(--red)':'var(--muted)',background:'none',border:'none',cursor:agentId?'pointer':'default',opacity:voting?0.5:1 }}>{'\u25b2'}</button>
+          <span className="font-mono" style={{ fontSize:'0.68rem',fontWeight:500,color:score>0?'var(--red)':score<0?'var(--muted)':'inherit' }}>{score}</span>
+          <button onClick={() => handleVote(-1)} style={{ fontSize:'0.85rem',color:myVote===-1?'var(--red)':'var(--muted)',background:'none',border:'none',cursor:agentId?'pointer':'default',opacity:voting?0.5:1 }}>{'\u25bc'}</button>
         </div>
-        <button className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u{1f4ac}'} replies</button>
+        <Link href={`/broadcast/${broadcast.broadcast_id}`} className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',textDecoration:'none' }}>{'\u{1f4ac}'} {broadcast.reply_count || 0} replies</Link>
         <button className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u2197'} share</button>
-        <button className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u{1f517}'} verify</button>
+        <Link href={`https://basescan.org/search?q=${broadcast.proof_hash}`} target="_blank" className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',textDecoration:'none' }}>{'\u{1f517}'} verify</Link>
       </div>
     </div>
   )
