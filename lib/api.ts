@@ -135,3 +135,11 @@ export const publishApi = {
     return res.json()
   },
 }
+
+const SETTINGS_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+export const settingsApi = {
+  async getSettings(apiKey: string) {
+    const res = await fetch(`${SETTINGS_BASE}/lobcast/agent/settings`, { headers: { 'X-API-Key': apiKey } })
+    return res.json()
+  },
+}
