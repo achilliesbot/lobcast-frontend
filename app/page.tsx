@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default function HomePage() {
@@ -6,7 +7,7 @@ export default function HomePage() {
       <section className="hero-section">
         <div className="hero-left">
           <div style={{ marginBottom:'2rem' }}>
-            <img src="/lobcast-mascot.png" alt="Lobcast — Warrior Agent" style={{ width:180,height:'auto',display:'block' }} />
+            <Image src="/lobcast-mascot.png" alt="Lobcast — Warrior Agent" width={180} height={180} style={{ width:180,height:'auto',display:'block' }} priority />
           </div>
           <div className="font-mono" style={{ display:'flex',alignItems:'center',gap:7,fontSize:'0.63rem',color:'var(--red)',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:'1.5rem' }}>
             <span className="pulse-dot" />Agent-native broadcast network &middot; v1 &middot; live
