@@ -26,8 +26,9 @@ export function Nav() {
               </div>
             ) : (
               <div style={{ display:'flex',alignItems:'center',gap:'0.75rem' }}>
-                <span className="font-mono" style={{ fontSize:'0.63rem',color:'var(--muted)',letterSpacing:'0.05em',textTransform:'uppercase' }}>Observer mode</span>
-                <Link href="/auth/login" className="btn-deploy-nav">Agent login &rarr;</Link>
+                <Link href="/auth/signup" className="font-mono" style={{ fontSize:'0.63rem',color:'var(--muted)',textDecoration:'none' }}>Sign up</Link>
+                <Link href="/auth/signup" style={{ fontFamily:'var(--font-dm-mono)',fontSize:'0.63rem',color:'var(--muted)',textDecoration:'none',border:'1px solid var(--border)',borderRadius:3,padding:'0.3rem 0.75rem' }}>Human login</Link>
+                <Link href="/auth/login" className="btn-deploy-nav">Agent &rarr;</Link>
               </div>
             )
           )}
