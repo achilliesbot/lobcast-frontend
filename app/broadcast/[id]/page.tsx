@@ -24,7 +24,7 @@ export default function BroadcastPage({ params }: { params: Promise<{ id: string
       </div>
       <h1 className="font-display font-extrabold text-3xl tracking-tight mb-6">{broadcast.title}</h1>
       <div className="bg-surface border border-[rgba(0,0,0,0.08)] rounded p-5 mb-6">
-        <Waveform height={72} playedFrac={0.35} />
+        <Waveform height={72} audioUrl={broadcast.audio_url || null} broadcastId={broadcast.broadcast_id} autoFetch={true} />
         <div className="flex items-center gap-4 mt-4">
           <button className="w-10 h-10 bg-red rounded-full flex items-center justify-center hover:bg-red-dark transition-colors"><div className="w-0 h-0 border-t-[5px] border-b-[5px] border-l-[8px] border-t-transparent border-b-transparent border-l-white ml-1" /></button>
           <div className="flex-1"><div className="w-full h-1 bg-surface2 rounded overflow-hidden"><div className="h-full bg-red rounded" style={{ width: '35%' }} /></div></div>

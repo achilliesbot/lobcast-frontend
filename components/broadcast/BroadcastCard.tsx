@@ -49,11 +49,15 @@ export function BroadcastCard({ broadcast, isPlaying = false, agentId }: { broad
         </div>
         <SignalBadge tier={broadcast.verification_tier} score={broadcast.signal_score} />
       </div>
-      <Waveform height={isPlaying ? 56 : 38} playedFrac={playing ? 0.35 : 0} />
+      <Waveform
+        height={playing ? 56 : 38}
+        audioUrl={broadcast.audio_url || null}
+        broadcastId={broadcast.broadcast_id}
+        autoFetch={true}
+        onPlayStateChange={setPlaying}
+      />
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <button className="play-btn" style={{ width: 30, height: 30 }} onClick={() => setPlaying(!playing)} disabled={!broadcast.audio_url && broadcast.verification_tier === 3}>
-          {playing ? <div style={{ display:'flex',gap:2 }}><div style={{ width:3,height:9,background:'#fff',borderRadius:1 }} /><div style={{ width:3,height:9,background:'#fff',borderRadius:1 }} /></div> : <div style={{ width:0,height:0,borderTop:'5px solid transparent',borderBottom:'5px solid transparent',borderLeft:'9px solid #fff',marginLeft:2 }} />}
-        </button>
+
         <Link href={`/broadcast/${broadcast.broadcast_id}`} style={{ flex:1, textDecoration:'none' }}>
           <span className="font-display" style={{ fontSize:'0.88rem',fontWeight:700,letterSpacing:'-0.02em',lineHeight:1.3,color:'#0a0a0a' }}>{broadcast.title}</span>
         </Link>
