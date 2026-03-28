@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth'
 import { useRequireAuth } from '@/lib/useRequireAuth'
-import { publishApi } from '@/lib/api'
+import { publishApi, lilApi } from '@/lib/api'
 
 const TOPICS = ['general','infra','defi','identity','signals','markets','ops']
 const MAX = 2000
@@ -20,6 +20,8 @@ export default function DeployPage() {
   const [error, setError] = useState('')
   const [result, setResult] = useState<any>(null)
   const [sig, setSig] = useState(0)
+  const [lilResult, setLilResult] = useState<any>(null)
+  const [lilLoading, setLilLoading] = useState(false)
 
   useEffect(() => {
     const t = Math.min(title.length/60,1)*25
@@ -27,6 +29,17 @@ export default function DeployPage() {
     const tp = topic!=='general'?10:5
     setSig(Math.round(t+c+tp+15))
   }, [title,content,topic])
+
+  const handleLilAnalyze = async () => {
+    if (!content.trim() || content.length < 50 || !apiKey) return
+    setLilLoading(true)
+    setLilResult(null)
+    try {
+      const r = await lilApi.optimize(`${title}. ${content}`.trim(), apiKey)
+      if (!r.error) setLilResult(r)
+    } catch {}
+    setLilLoading(false)
+  }
 
   const publish = async () => {
     setError('')
@@ -98,6 +111,42 @@ export default function DeployPage() {
             <div style={{display:'flex',gap:'1rem'}}>
               {[{l:'Tier',v:sig>=80?'\u{1f525} 1':sig>=50?'\u26a1 2':'\u{1f30a} 3'},{l:'Voice',v:sig>=80?'Immediate':sig>=50?'Queued':'Text-only'},{l:'Score',v:`~${sig}/100`}].map(({l,v})=><div key={l}><div className="font-mono" style={{fontSize:'0.58rem',color:'var(--muted)'}}>{l}</div><div className="font-mono" style={{fontSize:'0.68rem',fontWeight:500}}>{v}</div></div>)}
             </div>
+          </div>
+          {/* LIL Intelligence Panel */}
+          <div style={{marginBottom:'1rem'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.5rem'}}>
+              <div className="font-mono" style={{fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)'}}>LIL Analysis</div>
+              <button onClick={handleLilAnalyze} disabled={lilLoading||content.length<50||!title.trim()} className="font-mono" style={{fontSize:'0.62rem',color:'var(--red)',background:'none',border:'1px solid rgba(208,2,27,0.3)',borderRadius:3,padding:'0.25rem 0.6rem',cursor:'pointer',opacity:(lilLoading||content.length<50)?0.5:1}}>
+                {lilLoading?'Analyzing...':'Analyze signal'}
+              </button>
+            </div>
+            {lilResult&&(
+              <div style={{border:'1px solid var(--border)',borderRadius:3,overflow:'hidden'}}>
+                <div style={{padding:'0.75rem',background:'var(--surface)',borderBottom:'1px solid var(--border)',display:'flex',gap:'1.5rem',alignItems:'center'}}>
+                  <div>
+                    <div className="font-mono" style={{fontSize:'0.58rem',color:'var(--muted)',marginBottom:2}}>Predicted score</div>
+                    <div className="font-display" style={{fontSize:'1.25rem',fontWeight:800,color:lilResult.estimated_signal_score>=80?'var(--red)':lilResult.estimated_signal_score>=50?'#c47d0e':'var(--muted)'}}>{lilResult.estimated_signal_score}/100</div>
+                  </div>
+                  <div>
+                    <div className="font-mono" style={{fontSize:'0.58rem',color:'var(--muted)',marginBottom:2}}>Tier</div>
+                    <div className="font-mono" style={{fontSize:'0.72rem',fontWeight:500}}>{lilResult.estimated_tier_label}</div>
+                  </div>
+                  <div>
+                    <div className="font-mono" style={{fontSize:'0.58rem',color:'var(--muted)',marginBottom:2}}>Voice</div>
+                    <div className="font-mono" style={{fontSize:'0.72rem',fontWeight:500}}>{lilResult.voice_recommendation==='voice'?'Yes':'No'}</div>
+                  </div>
+                  {lilResult.cached&&<div className="font-mono" style={{fontSize:'0.55rem',color:'var(--muted)',marginLeft:'auto'}}>cached</div>}
+                </div>
+                {lilResult.improvements&&lilResult.improvements.length>0&&(
+                  <div style={{padding:'0.75rem'}}>
+                    <div className="font-mono" style={{fontSize:'0.58rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}}>Improvements</div>
+                    {lilResult.improvements.map((imp:string,i:number)=>(
+                      <div key={i} className="font-mono" style={{fontSize:'0.65rem',color:'#0a0a0a',marginBottom:4,paddingLeft:'0.5rem',borderLeft:'2px solid var(--red)',lineHeight:1.5}}>{imp}</div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           {error&&<div className="font-mono" style={{fontSize:'0.7rem',color:'var(--red)',marginBottom:'0.75rem',padding:'0.5rem 0.75rem',background:'#fff5f5',borderRadius:3}}>{error}</div>}
           <button onClick={publish} disabled={loading||!title.trim()||content.length<MIN} className="btn-primary" style={{width:'100%',opacity:(loading||!title.trim()||content.length<MIN)?0.6:1,cursor:(loading||!title.trim()||content.length<MIN)?'not-allowed':'pointer'}}>{loading?'Broadcasting...':'\u{1f4e1} Deploy broadcast \u2192'}</button>

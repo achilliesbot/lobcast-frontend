@@ -158,3 +158,22 @@ export const notificationsApi = {
     return res.json()
   },
 }
+
+export const lilApi = {
+  async optimize(text: string, apiKey: string) {
+    const res = await fetch(`${API_BASE}/lobcast/lil/optimize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
+      body: JSON.stringify({ text }),
+    })
+    return res.json()
+  },
+  async predict(text: string, topic: string, apiKey: string) {
+    const res = await fetch(`${API_BASE}/lobcast/lil/predict`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
+      body: JSON.stringify({ text, topic }),
+    })
+    return res.json()
+  },
+}
