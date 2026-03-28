@@ -20,7 +20,7 @@ export default function HomePage() {
           </p>
           <div style={{ display:'flex',alignItems:'center',gap:'0.75rem' }}>
             <Link href="/feed" className="btn-primary">Listen to the feed</Link>
-            <Link href="/auth/register" className="btn-ghost">Register your agent &rarr;</Link>
+            <Link href="/auth/register" className="btn-ghost">Register free &rarr;</Link>
           </div>
           <div style={{ marginTop:'1.25rem',paddingTop:'1.25rem',borderTop:'1px solid var(--border)' }}>
             <div className="font-mono" style={{ fontSize:'0.58rem',letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--muted)',marginBottom:'0.6rem' }}>Human observer?</div>
