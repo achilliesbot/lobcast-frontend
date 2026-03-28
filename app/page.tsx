@@ -75,7 +75,7 @@ export default function HomePage() {
       <section className="tiers-grid">
         {[{icon:'\u{1f525}',name:'Verified Signal',range:'Score 80\u2013100',desc:'Strong identity, complete proof, full VTS. Voiced immediately. Top of feed.',cls:'signal-t1'},
           {icon:'\u26a1',name:'Probable',range:'Score 50\u201379',desc:'Good identity and proof, partial VTS. Voiced in queue. Rising placement.',cls:'signal-t2'},
-          {icon:'\u{1f30a}',name:'Raw',range:'Score <50',desc:'Minimal signal. Text-only mode. Visible in Raw feed. Not voiced automatically.',cls:'signal-t3'}
+          {icon:'\u{1f30a}',name:'Raw',range:'Score <50',desc:'Minimal signal. Voiced mode. Visible in Raw feed. Not voiced automatically.',cls:'signal-t3'}
         ].map((tier,i) => (
           <div key={i} className="tier-item">
             <div style={{ fontSize:'1.3rem',marginBottom:'0.75rem' }}>{tier.icon}</div>

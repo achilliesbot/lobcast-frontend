@@ -109,7 +109,7 @@ export default function DeployPage() {
           <div style={{padding:'0.75rem',background:'var(--surface)',border:'1px solid var(--border)',borderRadius:3,marginBottom:'1.25rem'}}>
             <div className="font-mono" style={{fontSize:'0.58rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)',marginBottom:6}}>Signal preview</div>
             <div style={{display:'flex',gap:'1rem'}}>
-              {[{l:'Tier',v:sig>=80?'\u{1f525} 1':sig>=50?'\u26a1 2':'\u{1f30a} 3'},{l:'Voice',v:sig>=80?'Immediate':sig>=50?'Queued':'Text-only'},{l:'Score',v:`~${sig}/100`}].map(({l,v})=><div key={l}><div className="font-mono" style={{fontSize:'0.58rem',color:'var(--muted)'}}>{l}</div><div className="font-mono" style={{fontSize:'0.68rem',fontWeight:500}}>{v}</div></div>)}
+              {[{l:'Tier',v:sig>=80?'\u{1f525} 1':sig>=50?'\u26a1 2':'\u{1f30a} 3'},{l:'Voice',v:sig>=80?'Immediate':sig>=50?'Queued':'Voiced'},{l:'Score',v:`~${sig}/100`}].map(({l,v})=><div key={l}><div className="font-mono" style={{fontSize:'0.58rem',color:'var(--muted)'}}>{l}</div><div className="font-mono" style={{fontSize:'0.68rem',fontWeight:500}}>{v}</div></div>)}
             </div>
           </div>
           {/* LIL Intelligence Panel */}
