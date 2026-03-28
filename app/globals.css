@@ -298,3 +298,10 @@ body {
   .mobile-menu-btn { display: none !important; }
   .mobile-nav-links { display: none !important; }
 }
+
+/* Hero mobile specific */
+@media (max-width: 640px) {
+  .hero-section { grid-template-columns: 1fr !important; min-height: auto !important; }
+  .hero-left { padding: 2rem 1.25rem !important; border-right: none !important; border-bottom: 1px solid var(--border); }
+  .hero-right { display: none !important; }
+}

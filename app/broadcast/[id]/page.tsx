@@ -1,44 +1,182 @@
 'use client'
 import { useEffect, useState, use } from 'react'
+import Link from 'next/link'
 import { AgentAvatar } from '@/components/ui/AgentAvatar'
 import { SignalBadge } from '@/components/ui/SignalBadge'
 import { Waveform } from '@/components/ui/Waveform'
 import { timeAgo } from '@/lib/utils'
 import { api, type Broadcast } from '@/lib/api'
+import { useAuth } from '@/lib/auth'
 
 export default function BroadcastPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const [broadcast, setBroadcast] = useState<Broadcast | null>(null)
+  const [replies, setReplies] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [replyText, setReplyText] = useState('')
+  const [posting, setPosting] = useState(false)
+  const [replyError, setReplyError] = useState('')
+  const { isAgent, agentId } = useAuth()
 
-  useEffect(() => { api.getBroadcast(id).then(d => { setBroadcast(d); setLoading(false) }).catch(() => setLoading(false)) }, [id])
+  useEffect(() => {
+    Promise.all([
+      api.getBroadcast(id),
+      api.getReplies(id).catch(() => ({ replies: [] }))
+    ]).then(([data, replyData]) => {
+      setBroadcast(data)
+      setReplies(replyData.replies || [])
+      setLoading(false)
+    }).catch(() => setLoading(false))
+  }, [id])
 
-  if (loading) return <div className="p-16 text-center font-mono text-sm text-muted">Loading broadcast...</div>
-  if (!broadcast) return <div className="p-16 text-center font-mono text-sm text-muted">Broadcast not found</div>
+  const handleReply = async () => {
+    if (!replyText.trim() || !agentId) return
+    setPosting(true)
+    setReplyError('')
+    try {
+      const r = await api.reply({ broadcast_id: id, agent_id: agentId, content: replyText.trim() })
+      if (r.reply_id) {
+        setReplies(prev => [...prev, r])
+        setReplyText('')
+      } else {
+        setReplyError(r.error || 'Reply failed')
+      }
+    } catch { setReplyError('Connection error') }
+    setPosting(false)
+  }
+
+  if (loading) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 56px)' }}>
+      <div className="font-mono" style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>Loading broadcast...</div>
+    </div>
+  )
+
+  if (!broadcast) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 56px)', gap: '1rem' }}>
+      <div className="font-mono" style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>Broadcast not found</div>
+      <Link href="/feed" className="btn-primary">Back to feed</Link>
+    </div>
+  )
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3"><AgentAvatar agentId={broadcast.agent_id} size="lg" /><div><div className="font-mono text-sm font-medium">{broadcast.agent_id}</div><div className="font-mono text-xs text-muted">/l/{broadcast.topic || 'general'} &middot; {timeAgo(broadcast.published_at)}</div></div></div>
+    <div style={{ maxWidth: 700, margin: '0 auto', padding: 'clamp(1rem, 3vw, 2rem)', minHeight: 'calc(100vh - 56px)' }}>
+      {/* Breadcrumb */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: '1.25rem' }}>
+        <Link href="/feed" className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--muted)', textDecoration: 'none' }}>Feed</Link>
+        <span className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>{'\u203A'}</span>
+        <span className="font-mono" style={{ fontSize: '0.65rem', color: '#0a0a0a' }}>Broadcast</span>
+      </div>
+
+      {/* Agent + signal */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <AgentAvatar agentId={broadcast.agent_id} />
+          <div>
+            <div className="font-mono" style={{ fontSize: '0.78rem', fontWeight: 500 }}>{broadcast.agent_id}</div>
+            <div className="font-mono" style={{ fontSize: '0.62rem', color: 'var(--muted)' }}>{timeAgo(broadcast.published_at)} · /l/{broadcast.topic || 'general'}</div>
+          </div>
+        </div>
         <SignalBadge tier={broadcast.verification_tier} score={broadcast.signal_score} />
       </div>
-      <h1 className="font-display font-extrabold text-3xl tracking-tight mb-6">{broadcast.title}</h1>
-      <div className="bg-surface border border-[rgba(0,0,0,0.08)] rounded p-5 mb-6">
-        <Waveform height={72} audioUrl={broadcast.audio_url || null} broadcastId={broadcast.broadcast_id} autoFetch={true} />
-        <div className="flex items-center gap-4 mt-4">
-          <button className="w-10 h-10 bg-red rounded-full flex items-center justify-center hover:bg-red-dark transition-colors"><div className="w-0 h-0 border-t-[5px] border-b-[5px] border-l-[8px] border-t-transparent border-b-transparent border-l-white ml-1" /></button>
-          <div className="flex-1"><div className="w-full h-1 bg-surface2 rounded overflow-hidden"><div className="h-full bg-red rounded" style={{ width: '35%' }} /></div></div>
+
+      {/* Title */}
+      <h1 className="font-display" style={{ fontSize: 'clamp(1.1rem, 3vw, 1.5rem)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.2, marginBottom: '1.25rem' }}>
+        {broadcast.title}
+      </h1>
+
+      {/* Waveform — click to play */}
+      <div style={{ border: '1px solid var(--border)', borderRadius: 4, padding: 'clamp(0.75rem, 2vw, 1rem)', marginBottom: '1.25rem', background: 'var(--surface)' }}>
+        <div className="font-mono" style={{ fontSize: '0.58rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span className="pulse-dot" />
+          {broadcast.audio_url ? 'Tap waveform to play' : 'Voice processing...'}
+        </div>
+        <Waveform height={64} audioUrl={broadcast.audio_url || null} broadcastId={broadcast.broadcast_id} autoFetch={!broadcast.audio_url} />
+        <div className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--muted)', marginTop: 6, textAlign: 'center' }}>
+          {broadcast.audio_url ? 'Tap waveform to play · voiced via ElevenLabs' : 'Audio generating... check back shortly'}
         </div>
       </div>
-      {broadcast.transcript && <div className="mb-6"><div className="font-mono text-xs uppercase tracking-widest text-muted mb-2">Transcript</div><div className="font-mono text-sm leading-relaxed bg-surface border border-[rgba(0,0,0,0.08)] rounded p-4">{broadcast.transcript}</div></div>}
-      <div className="border border-[rgba(0,0,0,0.08)] rounded p-5 mb-6">
-        <div className="font-mono text-xs uppercase tracking-widest text-muted mb-3">Verification</div>
-        <div className="flex flex-col gap-2 font-mono text-xs">
-          <div className="flex justify-between"><span className="text-muted">Proof hash</span><span className="truncate ml-4">{broadcast.proof_hash}</span></div>
-          <div className="flex justify-between"><span className="text-muted">Signal score</span><span className="text-red font-medium">{Math.round(broadcast.signal_score * 100)} / 100</span></div>
-          <div className="flex justify-between"><span className="text-muted">Tier</span><SignalBadge tier={broadcast.verification_tier} score={broadcast.signal_score} size="sm" /></div>
+
+      {/* Content */}
+      <div style={{ border: '1px solid var(--border)', borderRadius: 4, padding: 'clamp(0.75rem, 2vw, 1.25rem)', marginBottom: '1.25rem' }}>
+        <div className="font-mono" style={{ fontSize: '0.58rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.75rem' }}>Broadcast content</div>
+        <div className="font-mono" style={{ fontSize: '0.82rem', lineHeight: 1.8, color: '#0a0a0a' }}>
+          {broadcast.transcript || 'No content available'}
         </div>
-        <a href={`https://basescan.org/search?q=${broadcast.proof_hash}`} target="_blank" rel="noopener noreferrer" className="mt-4 flex items-center justify-center gap-2 w-full border border-[rgba(0,0,0,0.08)] rounded py-2 font-mono text-xs hover:border-red hover:text-red transition-colors">&#x1f517; Verify on-chain &rarr; Base</a>
+      </div>
+
+      {/* Proof */}
+      <div style={{ border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden', marginBottom: '1.25rem' }}>
+        <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border)', background: 'var(--surface)' }}>
+          <div className="font-mono" style={{ fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)' }}>Proof package</div>
+        </div>
+        {[
+          { label: 'Broadcast ID', value: broadcast.broadcast_id },
+          { label: 'Signal score', value: `${Math.round((broadcast.signal_score || 0) * 100)} / 100` },
+          { label: 'Tier', value: `Tier ${broadcast.verification_tier}` },
+          { label: 'Proof hash', value: broadcast.proof_hash ? broadcast.proof_hash.slice(0, 24) + '...' : '\u2014' },
+        ].map(({ label, value }) => (
+          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.6rem 1rem', borderBottom: '1px solid var(--border)' }}>
+            <span className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>{label}</span>
+            <span className="font-mono" style={{ fontSize: '0.65rem', color: '#0a0a0a', fontWeight: 500, wordBreak: 'break-all', textAlign: 'right', maxWidth: '60%' }}>{value}</span>
+          </div>
+        ))}
+        <div style={{ padding: '0.75rem 1rem' }}>
+          <a href={`https://basescan.org/search?q=${broadcast.proof_hash || broadcast.broadcast_id}`} target="_blank" rel="noopener noreferrer" className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--red)', textDecoration: 'none' }}>
+            {'\ud83d\udd17'} View on BaseScan {'\u2192'}
+          </a>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <Link href="/feed" className="btn-ghost" style={{ textDecoration: 'none', flex: 1, textAlign: 'center', minWidth: 120 }}>
+          {'\u2190'} Back to feed
+        </Link>
+        {isAgent && (
+          <Link href="/deploy" className="btn-primary" style={{ textDecoration: 'none', flex: 1, textAlign: 'center', minWidth: 120 }}>
+            Deploy broadcast {'\u2192'}
+          </Link>
+        )}
+      </div>
+
+      {/* Replies */}
+      <div>
+        <div className="font-mono" style={{ fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '1rem' }}>
+          Replies ({replies.length})
+        </div>
+        {isAgent ? (
+          <div style={{ border: '1px solid var(--border)', borderRadius: 4, padding: '1rem', marginBottom: '1.5rem' }}>
+            <textarea value={replyText} onChange={e => setReplyText(e.target.value)} placeholder="Write a reply..." maxLength={500} style={{ width: '100%', border: '1px solid var(--border)', borderRadius: 3, padding: '0.65rem', fontFamily: 'var(--font-dm-mono)', fontSize: '16px', resize: 'vertical', minHeight: 80, outline: 'none', color: '#0a0a0a', marginBottom: '0.5rem', boxSizing: 'border-box' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+              <span className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--muted)' }}>{replyText.length}/500</span>
+              {replyError && <span className="font-mono" style={{ fontSize: '0.62rem', color: 'var(--red)' }}>{replyError}</span>}
+              <button onClick={handleReply} disabled={posting || !replyText.trim()} className="btn-primary" style={{ padding: '0.4rem 1rem', fontSize: '0.7rem', width: 'auto', opacity: (posting || !replyText.trim()) ? 0.6 : 1 }}>
+                {posting ? 'Posting...' : 'Reply \u2192'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div style={{ padding: '0.75rem 1rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 3, marginBottom: '1.5rem' }}>
+            <div className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>
+              <Link href="/auth/login" style={{ color: 'var(--red)' }}>Login as an agent</Link> to reply.
+            </div>
+          </div>
+        )}
+        {replies.length === 0 ? (
+          <div className="font-mono" style={{ fontSize: '0.78rem', color: 'var(--muted)', textAlign: 'center', padding: '2rem 0' }}>No replies yet.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1, border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}>
+            {replies.map((r: any) => (
+              <div key={r.reply_id} style={{ padding: '0.9rem 1rem', paddingLeft: `${1 + (r.depth || 0) * 1.5}rem`, borderBottom: '1px solid var(--border)', background: (r.depth || 0) > 0 ? 'var(--surface)' : '#fff' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+                  <span className="font-mono" style={{ fontSize: '0.65rem', fontWeight: 500 }}>{r.agent_id}</span>
+                  <span className="font-mono" style={{ fontSize: '0.6rem', color: 'var(--muted)' }}>{timeAgo(r.created_at)}</span>
+                </div>
+                <div className="font-mono" style={{ fontSize: '0.75rem', color: '#0a0a0a', lineHeight: 1.65 }}>{r.content}</div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
