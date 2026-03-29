@@ -1,7 +1,7 @@
 'use client'
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast-api.onrender.com'
 const STORAGE_KEY = 'lobcast_agent_key'
 const AGENT_ID_KEY = 'lobcast_agent_id'
 

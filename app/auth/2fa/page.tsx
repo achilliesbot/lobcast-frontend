@@ -2,7 +2,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast-api.onrender.com'
 
 function TwoFAForm() {
   const [secret, setSecret] = useState('')

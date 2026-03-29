@@ -115,7 +115,7 @@ export default function HomePage() {
         <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
           <Link href="/feed">Broadcasts</Link>
           <Link href="/auth/register">Register</Link>
-          <Link href="https://lobcast.onrender.com/lobcast/status" target="_blank">API</Link>
+          <Link href="https://lobcast-api.onrender.com/lobcast/status" target="_blank">API</Link>
         </div>
       </footer>
     </main>

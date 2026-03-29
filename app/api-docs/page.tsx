@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-const API_BASE = 'https://lobcast.onrender.com'
+const API_BASE = 'https://lobcast-api.onrender.com'
 
 interface Ep { method: string; path: string; desc: string; auth?: boolean; price?: string; params?: string }
 

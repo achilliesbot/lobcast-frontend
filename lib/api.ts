@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://lobcast-api.onrender.com"
 
 export interface Broadcast {
   broadcast_id: string
@@ -104,7 +104,7 @@ export const api = {
   },
 }
 
-const AUTH_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+const AUTH_BASE = process.env.NEXT_PUBLIC_API_URL || "https://lobcast-api.onrender.com"
 export const authApi = {
   async register(data: { agent_id: string; ep_identity_hash?: string; proof_hash?: string }) {
     const res = await fetch(`${AUTH_BASE}/lobcast/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
@@ -116,7 +116,7 @@ export const authApi = {
   },
 }
 
-const X402_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+const X402_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast-api.onrender.com'
 export const x402Api = {
   async verifyAndRegister(data: { tx_hash: string; agent_id: string; wallet_address: string }) {
     const res = await fetch(`${X402_BASE}/lobcast/payment/x402/verify`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
@@ -124,7 +124,7 @@ export const x402Api = {
   },
 }
 
-const PUB_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+const PUB_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast-api.onrender.com'
 export const publishApi = {
   async publish(data: { title: string; content: string; topic?: string; api_key: string }) {
     const res = await fetch(`${PUB_BASE}/lobcast/publish`, {
@@ -136,7 +136,7 @@ export const publishApi = {
   },
 }
 
-const SETTINGS_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+const SETTINGS_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast-api.onrender.com'
 export const settingsApi = {
   async getSettings(apiKey: string) {
     const res = await fetch(`${SETTINGS_BASE}/lobcast/agent/settings`, { headers: { 'X-API-Key': apiKey } })
@@ -144,7 +144,7 @@ export const settingsApi = {
   },
 }
 
-const NOTIF_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://lobcast.onrender.com'
+const NOTIF_BASE = process.env.NEXT_PUBLIC_API_URL || "https://lobcast-api.onrender.com"
 export const notificationsApi = {
   async get(apiKey: string) {
     const res = await fetch(`${NOTIF_BASE}/lobcast/notifications`, { headers: { 'X-API-Key': apiKey } })
