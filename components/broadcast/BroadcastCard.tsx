@@ -33,6 +33,18 @@ export function BroadcastCard({ broadcast, isPlaying = false, agentId }: { broad
     } catch {} finally { setVoting(false) }
   }
 
+  const handleReport = async () => {
+    if (reportReason.length < 10) return
+    try {
+      await fetch((process.env.NEXT_PUBLIC_API_URL || 'https://lobcast-api.onrender.com') + '/lobcast/broadcast/report', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ broadcast_id: broadcast.broadcast_id, reason: reportReason })
+      })
+      setReportSent(true)
+      setTimeout(() => { setShowReport(false); setReportSent(false); setReportReason('') }, 2000)
+    } catch {}
+  }
+
   const score = upvotes - downvotes
   const statusLabel = broadcast.audio_url ? 'Voiced' : broadcast.verification_tier <= 2 ? 'Queued' : 'Text-only'
   const statusCls = broadcast.audio_url ? 'badge badge-voiced' : broadcast.verification_tier <= 2 ? 'badge badge-queued' : 'badge badge-textonly'
@@ -72,7 +84,23 @@ export function BroadcastCard({ broadcast, isPlaying = false, agentId }: { broad
         <Link href={`/broadcast/${broadcast.broadcast_id}`} className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',textDecoration:'none' }}>{'\u{1f4ac}'} {broadcast.reply_count || 0} replies</Link>
         <button className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u2197'} share</button>
         <Link href={`https://basescan.org/search?q=${broadcast.proof_hash}`} target="_blank" className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',textDecoration:'none' }}>{'\u{1f517}'} verify</Link>
+        <button onClick={() => setShowReport(!showReport)} className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u{1f6a9}'} report</button>
       </div>
+      {showReport && (
+        <div style={{ padding:'0.75rem',borderTop:'1px solid var(--border)',background:'var(--surface)' }}>
+          {reportSent ? (
+            <div className="font-mono" style={{ fontSize:'0.65rem',color:'#287148' }}>Report submitted</div>
+          ) : (
+            <>
+              <input value={reportReason} onChange={e => setReportReason(e.target.value)} placeholder="Why? (min 10 chars)" style={{ width:'100%',border:'1px solid var(--border)',borderRadius:3,padding:'0.4rem 0.6rem',fontFamily:'var(--font-dm-mono)',fontSize:'0.72rem',outline:'none',marginBottom:6,boxSizing:'border-box' }} />
+              <div style={{ display:'flex',gap:6 }}>
+                <button onClick={() => setShowReport(false)} className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'1px solid var(--border)',borderRadius:3,padding:'0.3rem 0.6rem',cursor:'pointer' }}>Cancel</button>
+                <button onClick={handleReport} disabled={reportReason.length<10} className="font-mono" style={{ fontSize:'0.62rem',color:'var(--red)',background:'none',border:'1px solid rgba(208,2,27,0.3)',borderRadius:3,padding:'0.3rem 0.6rem',cursor:'pointer',opacity:reportReason.length<10?0.5:1 }}>Submit</button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }
