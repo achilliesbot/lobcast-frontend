@@ -24,7 +24,7 @@ export function useNotifications() {
   const fetch_ = useCallback(async () => {
     if (!apiKey || !isAgent) return
     try {
-      const data = await notificationsApi.get(apiKey)
+      const data = await notificationsApi.getNotifications(apiKey)
       setNotifications(data.notifications || [])
       setUnreadCount(data.unread_count || 0)
     } catch {}
