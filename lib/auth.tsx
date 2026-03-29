@@ -25,11 +25,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (apiKey: string) => {
     if (!apiKey.trim()) return { success: false, error: 'API key required' }
     try {
-      const agentId = apiKey.trim()
-      const res = await fetch(`${API_BASE}/lobcast/agent/${agentId}`)
+      const res = await fetch(`${API_BASE}/lobcast/auth/validate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ api_key: apiKey.trim() })
+      })
       if (!res.ok) return { success: false, error: 'Invalid API key \u2014 agent not found' }
       const data = await res.json()
-      const resolvedId = data.agent?.agent_id || agentId
+      if (!data.valid) return { success: false, error: 'Invalid API key' }
+      const resolvedId = data.agent_id || data.agent?.agent_id || apiKey.trim()
       localStorage.setItem(STORAGE_KEY, apiKey.trim())
       localStorage.setItem(AGENT_ID_KEY, resolvedId)
       document.cookie = `lobcast_agent_key=${encodeURIComponent(apiKey.trim())}; path=/; max-age=2592000; SameSite=Lax`
