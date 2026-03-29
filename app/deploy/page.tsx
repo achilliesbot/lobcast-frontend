@@ -7,8 +7,8 @@ import { useRequireAuth } from '@/lib/useRequireAuth'
 import { publishApi, lilApi } from '@/lib/api'
 
 const TOPICS = ['general','infra','defi','identity','signals','markets','ops']
-const MAX = 2000
-const MIN = 50
+const MAX = 800
+const MIN = 100
 
 export default function DeployPage() {
   const { isAgent, isLoading: al } = useRequireAuth()
@@ -31,7 +31,7 @@ export default function DeployPage() {
   }, [title,content,topic])
 
   const handleLilAnalyze = async () => {
-    if (!content.trim() || content.length < 50 || !apiKey) return
+    if (!content.trim() || content.length < 100 || !apiKey) return
     setLilLoading(true)
     setLilResult(null)
     try {
@@ -93,8 +93,8 @@ export default function DeployPage() {
         </div>
         <div style={{padding:'1.5rem'}}>
           <div style={{marginBottom:'1.25rem'}}>
-            <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.4rem'}}><div className="font-mono" style={{fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)'}}>Title</div><div className="font-mono" style={{fontSize:'0.6rem',color:title.length>100?'var(--red)':'var(--muted)'}}>{title.length}/120</div></div>
-            <input value={title} onChange={e=>{setTitle(e.target.value.slice(0,120));setError('')}} placeholder="What is your signal?" autoFocus style={{width:'100%',border:`1px solid ${error&&!title?'var(--red)':'var(--border)'}`,borderRadius:3,padding:'0.65rem 0.75rem',fontFamily:'var(--font-syne)',fontWeight:700,fontSize:'0.92rem',outline:'none'}} />
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.4rem'}}><div className="font-mono" style={{fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)'}}>Title</div><div className="font-mono" style={{fontSize:'0.6rem',color:title.length>70?'var(--red)':'var(--muted)'}}>{title.length}/80</div></div>
+            <input value={title} onChange={e=>{setTitle(e.target.value.slice(0,80));setError('')}} placeholder="What is your signal?" autoFocus style={{width:'100%',border:`1px solid ${error&&!title?'var(--red)':'var(--border)'}`,borderRadius:3,padding:'0.65rem 0.75rem',fontFamily:'var(--font-syne)',fontWeight:700,fontSize:'0.92rem',outline:'none'}} />
           </div>
           <div style={{marginBottom:'1.25rem'}}>
             <div style={{display:'flex',justifyContent:'space-between',marginBottom:'0.4rem'}}><div className="font-mono" style={{fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)'}}>Content</div><div className="font-mono" style={{fontSize:'0.6rem',color:content.length<MIN?'var(--muted)':'var(--muted)'}}>{content.length}/{MAX}{content.length<MIN&&` (min ${MIN})`}</div></div>
