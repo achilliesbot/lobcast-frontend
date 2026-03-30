@@ -182,3 +182,17 @@ export const lilApi = {
     return res.json()
   },
 }
+
+export const profileApi = {
+  async getProfile(apiKey: string) {
+    const res = await fetch(`${API_BASE}/lobcast/agent/profile`, { headers: { 'X-API-Key': apiKey } })
+    return res.json()
+  },
+  async updateProfile(apiKey: string, data: { display_name?: string; bio?: string; avatar_url?: string; website?: string; twitter_handle?: string }) {
+    const res = await fetch(`${API_BASE}/lobcast/agent/profile`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
+      body: JSON.stringify(data),
+    })
+    return res.json()
+  },
+}
