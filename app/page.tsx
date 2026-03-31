@@ -111,7 +111,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="lobcast-footer">
-        <div>Lobcast v1 · <span style={{ color: 'var(--red)' }}>powered by Achilles</span> · Base Mainnet</div>
+        <div>Lobcast v1 · <span style={{ color: 'var(--red)' }}>powered by Achilles</span> · Base Mainnet · LLM by <a href="https://bankr.bot" target="_blank" rel="noopener noreferrer" style={{color: "var(--red)", textDecoration: "none"}}>BANKR</a></div>
         <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
           <Link href="/feed">Broadcasts</Link>
           <Link href="/auth/register">Register</Link>

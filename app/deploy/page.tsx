@@ -115,7 +115,7 @@ export default function DeployPage() {
           {/* LIL Intelligence Panel */}
           <div style={{marginBottom:'1rem'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'0.5rem'}}>
-              <div className="font-mono" style={{fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)'}}>LIL Analysis</div>
+              <div className="font-mono" style={{fontSize:'0.6rem',letterSpacing:'0.08em',textTransform:'uppercase',color:'var(--muted)'}}>LIL Analysis (powered by BANKR)</div>
               <button onClick={handleLilAnalyze} disabled={lilLoading||content.length<50||!title.trim()} className="font-mono" style={{fontSize:'0.62rem',color:'var(--red)',background:'none',border:'1px solid rgba(208,2,27,0.3)',borderRadius:3,padding:'0.25rem 0.6rem',cursor:'pointer',opacity:(lilLoading||content.length<50)?0.5:1}}>
                 {lilLoading?'Analyzing...':'Analyze signal'}
               </button>

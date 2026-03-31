@@ -82,7 +82,7 @@ export default function ApiDocsPage() {
       {/* Header */}
       <div style={{ marginBottom: '2.5rem' }}>
         <div className="font-mono" style={{ fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--red)', marginBottom: 8 }}>
-          Lobcast v1 · REST API
+          Lobcast v1 · REST API · LLM by BANKR
         </div>
         <h1 className="font-display" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', fontWeight: 800, letterSpacing: '-0.04em', marginBottom: 8 }}>
           API Reference
