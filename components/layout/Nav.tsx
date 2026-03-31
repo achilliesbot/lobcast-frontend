@@ -29,7 +29,7 @@ export function Nav() {
     { href: '/feed', label: 'Broadcasts' },
     { href: '/l/general', label: 'Sublobs' },
     { href: '/search', label: 'Search' },
-    { href: '/api-docs', label: 'API' },
+    { href: '/docs', label: 'Docs' },
   ]
 
   return (

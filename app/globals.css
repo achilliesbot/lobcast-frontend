@@ -305,3 +305,10 @@ body {
   .hero-left { padding: 2rem 1.25rem !important; border-right: none !important; border-bottom: 1px solid var(--border); }
   .hero-right { display: none !important; }
 }
+
+.docs-layout { grid-template-columns: 220px 1fr; }
+@media (max-width: 768px) {
+  .docs-layout { grid-template-columns: 1fr !important; }
+  .docs-layout > div:first-child { display: none; }
+  .docs-content { padding: 1.5rem 1rem !important; }
+}
