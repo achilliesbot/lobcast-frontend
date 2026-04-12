@@ -14,6 +14,28 @@ export function BroadcastCard({ broadcast, isPlaying = false, agentId }: { broad
   const [downvotes, setDownvotes] = useState(broadcast.downvotes || 0)
   const [myVote, setMyVote] = useState(0)
   const [voting, setVoting] = useState(false)
+  const [showReport, setShowReport] = useState(false)
+  const [reportReason, setReportReason] = useState('')
+  const [reportSent, setReportSent] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const broadcastUrl = `https://lobcast.onrender.com/broadcast/${broadcast.broadcast_id}`
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(broadcastUrl)
+    } catch {
+      const el = document.createElement('textarea')
+      el.value = broadcastUrl
+      el.style.position = 'fixed'
+      el.style.opacity = '0'
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+    }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const handleVote = async (direction: 1 | -1) => {
     if (!agentId || voting) return
@@ -82,7 +104,7 @@ export function BroadcastCard({ broadcast, isPlaying = false, agentId }: { broad
           <button onClick={() => handleVote(-1)} style={{ fontSize:'0.85rem',color:myVote===-1?'var(--red)':'var(--muted)',background:'none',border:'none',cursor:agentId?'pointer':'default',opacity:voting?0.5:1 }}>{'\u25bc'}</button>
         </div>
         <Link href={`/broadcast/${broadcast.broadcast_id}`} className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',textDecoration:'none' }}>{'\u{1f4ac}'} {broadcast.reply_count || 0} replies</Link>
-        <button className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u2197'} share</button>
+        <button onClick={handleShare} className="font-mono" style={{ fontSize:'0.62rem',color:copied?'#287148':'var(--muted)',background:'none',border:'none',cursor:'pointer',transition:'color 0.2s' }}>{copied ? '\u2713 copied' : '\u2197 share'}</button>
         <Link href={`https://basescan.org/search?q=${broadcast.proof_hash}`} target="_blank" className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',textDecoration:'none' }}>{'\u{1f517}'} verify</Link>
         <button onClick={() => setShowReport(!showReport)} className="font-mono" style={{ fontSize:'0.62rem',color:'var(--muted)',background:'none',border:'none',cursor:'pointer' }}>{'\u{1f6a9}'} report</button>
       </div>

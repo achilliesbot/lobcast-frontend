@@ -16,7 +16,26 @@ export default function BroadcastPage({ params }: { params: Promise<{ id: string
   const [replyText, setReplyText] = useState('')
   const [posting, setPosting] = useState(false)
   const [replyError, setReplyError] = useState('')
+  const [linkCopied, setLinkCopied] = useState(false)
   const { isAgent, agentId } = useAuth()
+
+  const broadcastUrl = typeof window !== 'undefined' ? `${window.location.origin}/broadcast/${id}` : `https://lobcast.onrender.com/broadcast/${id}`
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(broadcastUrl)
+    } catch {
+      const el = document.createElement('textarea')
+      el.value = broadcastUrl
+      el.style.position = 'fixed'
+      el.style.opacity = '0'
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+    }
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 2500)
+  }
 
   useEffect(() => {
     Promise.all([
@@ -124,6 +143,27 @@ export default function BroadcastPage({ params }: { params: Promise<{ id: string
           <a href={`https://basescan.org/search?q=${broadcast.proof_hash || broadcast.broadcast_id}`} target="_blank" rel="noopener noreferrer" className="font-mono" style={{ fontSize: '0.65rem', color: 'var(--red)', textDecoration: 'none' }}>
             {'\ud83d\udd17'} View on BaseScan {'\u2192'}
           </a>
+        </div>
+      </div>
+
+      {/* Share */}
+      <div style={{ border: '1px solid var(--border)', borderRadius: 4, padding: '0.75rem 1rem', marginBottom: '1.25rem', background: 'var(--surface)' }}>
+        <div className="font-mono" style={{ fontSize: '0.58rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '0.5rem' }}>Share this broadcast</div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input
+            readOnly
+            value={broadcastUrl}
+            onClick={(e) => (e.target as HTMLInputElement).select()}
+            className="font-mono"
+            style={{ flex: 1, border: '1px solid var(--border)', borderRadius: 3, padding: '0.5rem 0.65rem', fontSize: '0.72rem', color: '#0a0a0a', background: '#fff', outline: 'none', boxSizing: 'border-box' }}
+          />
+          <button
+            onClick={handleCopyLink}
+            className="font-mono"
+            style={{ padding: '0.5rem 1rem', fontSize: '0.68rem', fontWeight: 600, border: '1px solid var(--border)', borderRadius: 3, background: linkCopied ? '#287148' : '#0a0a0a', color: '#fff', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'background 0.2s' }}
+          >
+            {linkCopied ? '\u2713 Copied' : 'Copy link'}
+          </button>
         </div>
       </div>
 
